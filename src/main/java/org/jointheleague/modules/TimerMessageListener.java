@@ -18,26 +18,7 @@ public class TimerMessageListener extends CustomMessageCreateListener {
 	@Override
 	public void handle(MessageCreateEvent event) {
 		// TODO Auto-generated method stub
-		if (event.getMessageContent().contains("!help")) {
-			event.getChannel().sendMessage("!timer<minutes>: Initial command to set the timer \n!snooze: Snoozes timer for 5 minutes");
-		}
-		if (!running) {
-			if (event.getMessageContent().contains("!snooze")) {
-				startTime = System.currentTimeMillis();
-				minutes=5;
-				running = true;
-				event.getChannel().sendMessage("Timer snoozed for 5 minutes");
-				while (running) {
-					if (System.currentTimeMillis() - startTime == minutes * 60000) {
-						event.getChannel().sendMessage("TIMER IS UP!!!");
-						running = false;
-						event.getChannel().sendMessage("Snooze?");
-					}
-				}
-			} else if (event.getMessageContent().contains("No")) {
-				event.getChannel().sendMessage("Timer has been stopped.");
-			}
-		} else if (event.getMessageContent().startsWith(COMMAND)) {
+		if (event.getMessageContent().startsWith(COMMAND)) {
 			time = event.getMessageContent().substring(6);
 			if (time.equals("")) {
 				event.getChannel().sendMessage("Time not entered! Please try '!timer<minutes>'.");
@@ -52,6 +33,38 @@ public class TimerMessageListener extends CustomMessageCreateListener {
 						event.getChannel().sendMessage("Snooze?");
 					}
 				}
+			}
+		} else if (event.getMessageContent().contains("!help")) {
+			event.getChannel().sendMessage("!timer<minutes>: Initial command to set the timer \n!snooze<minutes>: Snoozes timer for set minutes");
+		} else if (!running) {
+			if (event.getMessageContent().startsWith("!snooze")) {
+				String snooze = event.getMessageContent().substring(7);
+				if (snooze.equals("")) {
+					startTime = System.currentTimeMillis();
+					running = true;
+					event.getChannel().sendMessage("Timer snoozed for " + minutes + " minutes");
+					while (running) {
+						if (System.currentTimeMillis() - startTime == minutes * 60000) {
+							event.getChannel().sendMessage("TIMER IS UP!!!");
+							running = false;
+							event.getChannel().sendMessage("Snooze?");
+						}
+					}
+				} else {
+					minutes = Integer.parseInt(snooze);
+					startTime = System.currentTimeMillis();
+					running = true;
+					event.getChannel().sendMessage("Timer snoozed for " + minutes + " minutes");
+					while (running) {
+						if (System.currentTimeMillis() - startTime == minutes * 60000) {
+							event.getChannel().sendMessage("TIMER IS UP!!!");
+							running = false;
+							event.getChannel().sendMessage("Snooze?");
+						}
+					}
+				}
+			} else if (event.getMessageContent().contains("No")) {
+				event.getChannel().sendMessage("Timer has been stopped.");
 			}
 		}
 	}
