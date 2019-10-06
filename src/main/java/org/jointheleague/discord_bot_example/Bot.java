@@ -3,6 +3,7 @@ package org.jointheleague.discord_bot_example;
 import org.javacord.api.DiscordApi; 
 import org.javacord.api.DiscordApiBuilder;
 import org.jointheleague.modules.CalculatorMessageListener;
+import org.jointheleague.modules.ChatMessageListener;
 import org.jointheleague.modules.RandomNumber;
 import org.jointheleague.modules.TimerMessageListener;
 import org.jointheleague.modules.Weather;
@@ -34,6 +35,7 @@ public class Bot  {
 		api.getServerTextChannelsByName(channelName).forEach(e -> e.sendMessage("Bot Connected"));
 		
 		//add Listeners
+		api.addMessageCreateListener(new ChatMessageListener(channelName));
 		api.addMessageCreateListener(new TimerMessageListener(channelName));
 		api.addMessageCreateListener(new RandomNumber(channelName));
 		api.addMessageCreateListener(new DadJokes(channelName));
