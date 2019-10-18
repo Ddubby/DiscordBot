@@ -9,7 +9,6 @@ public class ChatMessageListener extends CustomMessageCreateListener{
 
 	private int karma = 0;
 	private boolean cursed = false;
-	private String finalS;
 	private ArrayList<String> gQuestions = new ArrayList<String>();
 	private ArrayList<String> bQuestions = new ArrayList<String>();
 	private ArrayList<String> gAnswers = new ArrayList<String>();
@@ -23,21 +22,22 @@ public class ChatMessageListener extends CustomMessageCreateListener{
 	@Override
 	public void handle(MessageCreateEvent event) {
 		// TODO Auto-generated method stub
-		gQuestions.add("Hello");
-		gQuestions.add("Hi");
-		gQuestions.add("How was your day?");
-		gAnswers.add("Hello " + event.getMessage().getAuthor().getDisplayName() + "!");
-		bAnswers.add("Hey there...");
-		gAnswers.add("Hi " + event.getMessage().getAuthor().getDisplayName() + "!");
-		bAnswers.add("Hey there...");
-		gAnswers.add("Good! How about you?");
-		bAnswers.add("Not good");
-		curseWords.add("test");
 		String message = event.getMessageContent().trim();
 		if (message.startsWith("//")) {
 			message.equals(message.substring(2));
-			finalS = answer(message);
-			event.getChannel().sendMessage(finalS);
+			gQuestions.add("Hello");
+			gQuestions.add("Hi");
+			gQuestions.add("How was your day?");
+			gQuestions.add("Search for ");
+			gAnswers.add("Hello " + event.getMessage().getAuthor().getDisplayName() + "!");
+			bAnswers.add("Hey there");
+			gAnswers.add("Hi " + event.getMessage().getAuthor().getDisplayName() + "!");
+			bAnswers.add("Hey there");
+			gAnswers.add("Good! How about you?");
+			bAnswers.add("Was doing better before you showed up");
+			gAnswers.add("Here's what I found: https://www.google.com/search?q=" + message.substring(13) + "\n");
+			curseWords.add("test");
+			event.getChannel().sendMessage(answer(message));
 			if (cursed) {
 				//event.getMessage().edit("[DELETED BY CHATBOT]");
 				cursed = false;
@@ -74,6 +74,6 @@ public class ChatMessageListener extends CustomMessageCreateListener{
 				}
 			}*/
 		}
-		return "Sorry, but it seems like I cannot generate a logical response\nMost likely scenario, you typed nonsense";
+		return "Sorry, but it seems like I cannot generate a logical response\n`Most likely scenario, you typed nonsense`";
 	}
 }
