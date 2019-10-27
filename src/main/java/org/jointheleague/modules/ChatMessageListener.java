@@ -35,7 +35,9 @@ public class ChatMessageListener extends CustomMessageCreateListener{
 			bAnswers.add("Hey there");
 			gAnswers.add("Good! How about you?");
 			bAnswers.add("Was doing better before you showed up");
-			gAnswers.add("Here's what I found: https://www.google.com/search?q=" + message.substring(13) + "\n");
+			if (message.startsWith("//Search for")) {
+				gAnswers.add("Here's what I found: https://www.google.com/search?q=" + message.substring(13) + "&source=lnms&tbm=isch&sa=X&ved=0ahUKEwior6LzhLvlAhVP1qwKHdh8BrAQ_AUIEigB&biw=1920&bih=890\n");
+			}
 			curseWords.add("test");
 			event.getChannel().sendMessage(answer(message));
 			if (cursed) {
