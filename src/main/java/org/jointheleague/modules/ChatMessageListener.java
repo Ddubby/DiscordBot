@@ -39,6 +39,7 @@ public class ChatMessageListener extends CustomMessageCreateListener{
 				gAnswers.add("Here's what I found: https://www.google.com/search?q=" + message.substring(13) + "&source=lnms&tbm=isch&sa=X&ved=0ahUKEwior6LzhLvlAhVP1qwKHdh8BrAQ_AUIEigB&biw=1920&bih=890\n");
 			}
 			curseWords.add("test");
+			event.getChannel().type();
 			event.getChannel().sendMessage(answer(message));
 			if (cursed) {
 				//event.getMessage().edit("[DELETED BY CHATBOT]");

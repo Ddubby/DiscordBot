@@ -1,6 +1,7 @@
 package org.jointheleague.modules;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import org.javacord.api.event.message.MessageCreateEvent;
 
@@ -9,7 +10,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 public class Connect4 extends CustomMessageCreateListener{
 	
 	private String rules = "Rules:\n1. Each player (two players) has respective colors Red and Blue\n2. When placed, circles will obey laws of gravity and fall down\n3. Place 4 circles in a row to win the game\n4. 4 in a row can be achieved horizontally, vertically, and diagonally";
-	private String commands = "Commands:\n!join: Joins the active Connect4 game\n!place<column>: Places circle on given column\n!stats<username>: Displays statistics of given user\n!rules: Displays all rules\n!commands: Displays all commands";
+	private String commands = "Commands:\n!join connect4: Joins the active Connect4 game\n!place<column>: Places circle on given column\n!end connect4: Ends the current running connect4 game\n!help connect4: Displays this help message";
 	private boolean load = false;
 	private boolean start = false;
 	private boolean win = false;
@@ -37,29 +38,41 @@ public class Connect4 extends CustomMessageCreateListener{
 		}
 		String message = event.getMessageContent().trim();
 		if (message.startsWith("!connect4")) {
-			event.getChannel().sendMessage("Loading Connect4...");
-			event.getChannel().sendMessage(board);
-			event.getChannel().sendMessage("\nStart the game by using !join connect4");
-			load = true;
+			if (!load) {
+				event.getChannel().sendMessage("Loading Connect4...");
+				event.getChannel().sendMessage(board);
+				event.getChannel().sendMessage("\nStart the game by using !join connect4");
+				load = true;	
+			} else {
+				event.getChannel().sendMessage("A connect4 game is already underway!");
+			}
 		} else if (load && message.startsWith("!join connect4")) {
 			if (player1.equals("")) {
 				player1 = event.getMessageAuthor().getDisplayName();
-				event.getChannel().sendMessage(player1 + " has joined the game\nWaiting for 1 more player...");
+				event.getChannel().sendMessage(player1 + " has joined the game!\nWaiting for 1 more player...");
 			} else {
 				player2 = event.getMessageAuthor().getDisplayName();
-				event.getChannel().sendMessage(player2 + " has joined the game\nGame starting...\nBegin by doing your first move!");
+				event.getChannel().sendMessage(player2 + " has joined the game!\nGame starting...\nBegin by doing your first move!");
 				board = "|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|";
 				event.getChannel().sendMessage(board);
 				row = 5;
 				start = true;
 			}
-		} else if (load && message.startsWith("!end")) {
+		} else if (load && message.startsWith("!end connect4")) {
 			load = false;
 			start = false;
-			event.getChannel().sendMessage("Game stopped");
+			event.getChannel().sendMessage("Game ended");
 		} else if(load && message.startsWith("!help connect4")) { 
-			event.getChannel().sendMessage(rules + "\n");
-			event.getChannel().sendMessage(commands + "\n");
+			try {
+				event.getMessageAuthor().asUser().get().openPrivateChannel().get().sendMessage(rules + "\n" + commands + "\n");
+				event.getChannel().sendMessage("Help message sent to your DMs!");
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else if (start && message.startsWith("!place")) {
 			turn++;
 			if (turn % 2 == 1) {
@@ -74,7 +87,7 @@ public class Connect4 extends CustomMessageCreateListener{
 						circle = " :red_circle: ";	
 						spaces[row * 7 + column - 1] = circle;
 					    board = "|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[0] + "|" + spaces[1] + "|" + spaces[2] + "|" + spaces[3] + "|" + spaces[4] + "|" + spaces[5] + "|" + spaces[6] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[7] + "|" + spaces[8] + "|" + spaces[9] + "|" + spaces[10] + "|" + spaces[11] + "|" + spaces[12] + "|" + spaces[13] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[14] + "|" + spaces[15] + "|" + spaces[16] + "|" + spaces[17] + "|" + spaces[18] + "|" + spaces[19] + "|" + spaces[20] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[21] + "|" + spaces[22] + "|" + spaces[23] + "|" + spaces[24] + "|" + spaces[25] + "|" + spaces[26] + "|" + spaces[27] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[28] + "|" + spaces[29] + "|" + spaces[30] + "|" + spaces[31] + "|" + spaces[32] + "|" + spaces[33] + "|" + spaces[34] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[35] + "|" + spaces[36] + "|" + spaces[37] + "|" + spaces[38] + "|" + spaces[39] + "|" + spaces[40] + "|" + spaces[41] + "|\n|-----|-----|-----|-----|-----|-----|-----|";
-						event.getChannel().sendMessage(board);
+					    event.getChannel().sendMessage(board);
 						row = 5;
 					}
 				} else {
@@ -93,10 +106,7 @@ public class Connect4 extends CustomMessageCreateListener{
 						circle = " :large_blue_circle: ";	
 						spaces[row * 7 + column - 1] = circle;
 					    board = "|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[0] + "|" + spaces[1] + "|" + spaces[2] + "|" + spaces[3] + "|" + spaces[4] + "|" + spaces[5] + "|" + spaces[6] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[7] + "|" + spaces[8] + "|" + spaces[9] + "|" + spaces[10] + "|" + spaces[11] + "|" + spaces[12] + "|" + spaces[13] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[14] + "|" + spaces[15] + "|" + spaces[16] + "|" + spaces[17] + "|" + spaces[18] + "|" + spaces[19] + "|" + spaces[20] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[21] + "|" + spaces[22] + "|" + spaces[23] + "|" + spaces[24] + "|" + spaces[25] + "|" + spaces[26] + "|" + spaces[27] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[28] + "|" + spaces[29] + "|" + spaces[30] + "|" + spaces[31] + "|" + spaces[32] + "|" + spaces[33] + "|" + spaces[34] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[35] + "|" + spaces[36] + "|" + spaces[37] + "|" + spaces[38] + "|" + spaces[39] + "|" + spaces[40] + "|" + spaces[41] + "|\n|-----|-----|-----|-----|-----|-----|-----|";
-						//event.getChannel().sendMessage(board);
-						/*if (winCheck()) {
-							System.out.println("game wo n");
-						}*/
+					    event.getChannel().sendMessage(board);
 						row = 5;
 					}
 				} else {

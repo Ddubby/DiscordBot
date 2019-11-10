@@ -25,7 +25,7 @@ public class TimerMessageListener extends CustomMessageCreateListener {
 			} else {
 				run(event, time);
 			}
-		} else if (event.getMessageContent().contains("!help")) {
+		} else if (event.getMessageContent().equals("!help")) {
 			event.getChannel().sendMessage("!timer<minutes>: Initial command to set the timer \n!snooze<minutes>: Snoozes timer for set minutes");
 		} else if (!running) {
 			if (event.getMessageContent().startsWith("!snooze")) {
