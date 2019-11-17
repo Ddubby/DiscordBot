@@ -40,7 +40,14 @@ public class ChatMessageListener extends CustomMessageCreateListener{
 			}
 			curseWords.add("test");
 			event.getChannel().type();
-			event.getChannel().sendMessage(answer(message));
+			long time = System.currentTimeMillis();
+			boolean wait = true;
+			while(wait) {
+				if (System.currentTimeMillis() - time == 1000) {
+					event.getChannel().sendMessage(answer(message));
+					wait = false;
+				}
+			}
 			if (cursed) {
 				//event.getMessage().edit("[DELETED BY CHATBOT]");
 				cursed = false;
