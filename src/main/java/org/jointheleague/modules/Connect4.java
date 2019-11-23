@@ -62,8 +62,10 @@ public class Connect4 extends CustomMessageCreateListener{
 				start = true;
 			}
 		} else if (load && message.startsWith("!end connect4")) {
+			board = "|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|";
 			load = false;
 			start = false;
+			turn = 0;
 			event.getChannel().sendMessage("Game ended");
 		} else if(load && message.startsWith("!help connect4")) { 
 			try {
@@ -81,22 +83,43 @@ public class Connect4 extends CustomMessageCreateListener{
 			if (turn % 2 == 1) {
 				if (event.getMessageAuthor().getDisplayName().equals(player1)) {
 					String move = message.substring(6);
-					column = Integer.parseInt(move);
-					if (column < 1 || column > 8) {
-						event.getChannel().sendMessage("Column index invalid! Please try your move again");
+					if (move.equals("")) {
+						event.getChannel().sendMessage("No column index entered! Please try your move again");
 						turn--;
 					} else {
-						rowCheck();
-						circle = " :red_circle: ";	
-						spaces[row * 7 + column - 1] = circle;
-					    board = "|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[0] + "|" + spaces[1] + "|" + spaces[2] + "|" + spaces[3] + "|" + spaces[4] + "|" + spaces[5] + "|" + spaces[6] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[7] + "|" + spaces[8] + "|" + spaces[9] + "|" + spaces[10] + "|" + spaces[11] + "|" + spaces[12] + "|" + spaces[13] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[14] + "|" + spaces[15] + "|" + spaces[16] + "|" + spaces[17] + "|" + spaces[18] + "|" + spaces[19] + "|" + spaces[20] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[21] + "|" + spaces[22] + "|" + spaces[23] + "|" + spaces[24] + "|" + spaces[25] + "|" + spaces[26] + "|" + spaces[27] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[28] + "|" + spaces[29] + "|" + spaces[30] + "|" + spaces[31] + "|" + spaces[32] + "|" + spaces[33] + "|" + spaces[34] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[35] + "|" + spaces[36] + "|" + spaces[37] + "|" + spaces[38] + "|" + spaces[39] + "|" + spaces[40] + "|" + spaces[41] + "|\n|-----|-----|-----|-----|-----|-----|-----|";
-					    event.getChannel().sendMessage(board);
-					    if (winCheck(column, row, circle)) {
-							event.getChannel().sendMessage(event.getMessageAuthor().getDisplayName() + " has won the game!\nStart a new game by typing !connect4 again!");
-							load = false;
-							start = false;
+						column = Integer.parseInt(move);
+						if (column < 1 || column > 8) {
+							event.getChannel().sendMessage("Column index invalid! Please try your move again");
+							turn--;
+						} else {
+							rowCheck();
+							if (row == -1) {
+								event.getChannel().sendMessage("There are no more spaces left in this column! Please try your move again");
+								turn--;
+								row = 5;
+							} else {
+								circle = " :red_circle: ";	
+								spaces[row * 7 + column - 1] = circle;
+							    board = "|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[0] + "|" + spaces[1] + "|" + spaces[2] + "|" + spaces[3] + "|" + spaces[4] + "|" + spaces[5] + "|" + spaces[6] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[7] + "|" + spaces[8] + "|" + spaces[9] + "|" + spaces[10] + "|" + spaces[11] + "|" + spaces[12] + "|" + spaces[13] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[14] + "|" + spaces[15] + "|" + spaces[16] + "|" + spaces[17] + "|" + spaces[18] + "|" + spaces[19] + "|" + spaces[20] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[21] + "|" + spaces[22] + "|" + spaces[23] + "|" + spaces[24] + "|" + spaces[25] + "|" + spaces[26] + "|" + spaces[27] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[28] + "|" + spaces[29] + "|" + spaces[30] + "|" + spaces[31] + "|" + spaces[32] + "|" + spaces[33] + "|" + spaces[34] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[35] + "|" + spaces[36] + "|" + spaces[37] + "|" + spaces[38] + "|" + spaces[39] + "|" + spaces[40] + "|" + spaces[41] + "|\n|-----|-----|-----|-----|-----|-----|-----|";
+							    event.getChannel().sendMessage(board);
+							    if (winCheck(column, row, circle)) {
+									event.getChannel().sendMessage(event.getMessageAuthor().getDisplayName() + " has won the game!\nStart a new game by typing !connect4 again!");
+									load = false;
+									start = false;
+								}
+							    for (int i = 0; i < spaces.length; i++) {
+							    	if (spaces[i].equals("        ")) {
+										break;
+									}
+							    	if (i == spaces.length - 1) {
+										event.getChannel().sendMessage("The game has ended in a draw!\nStart a new game by typing !connect4 again!");
+										load = false;
+										start = false;
+									}
+								}
+								row = 5;
+							}
 						}
-						row = 5;
 					}
 				} else {
 					event.getChannel().sendMessage("It is not your turn yet " + event.getMessageAuthor().getDisplayName() + "!");
@@ -105,22 +128,43 @@ public class Connect4 extends CustomMessageCreateListener{
 			} else {
 				if (event.getMessageAuthor().getDisplayName().equals(player2)) {
 					String move = message.substring(6);
-					column = Integer.parseInt(move);
-					if (column < 1 || column > 8) {
-						event.getChannel().sendMessage("Column index invalid! Please try your move again");
+					if (move.equals("")) {
+						event.getChannel().sendMessage("No column index entered! Please try your move again");
 						turn--;
 					} else {
-						rowCheck();
-						circle = " :blue_circle: ";	
-						spaces[row * 7 + column - 1] = circle;
-					    board = "|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[0] + "|" + spaces[1] + "|" + spaces[2] + "|" + spaces[3] + "|" + spaces[4] + "|" + spaces[5] + "|" + spaces[6] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[7] + "|" + spaces[8] + "|" + spaces[9] + "|" + spaces[10] + "|" + spaces[11] + "|" + spaces[12] + "|" + spaces[13] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[14] + "|" + spaces[15] + "|" + spaces[16] + "|" + spaces[17] + "|" + spaces[18] + "|" + spaces[19] + "|" + spaces[20] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[21] + "|" + spaces[22] + "|" + spaces[23] + "|" + spaces[24] + "|" + spaces[25] + "|" + spaces[26] + "|" + spaces[27] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[28] + "|" + spaces[29] + "|" + spaces[30] + "|" + spaces[31] + "|" + spaces[32] + "|" + spaces[33] + "|" + spaces[34] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[35] + "|" + spaces[36] + "|" + spaces[37] + "|" + spaces[38] + "|" + spaces[39] + "|" + spaces[40] + "|" + spaces[41] + "|\n|-----|-----|-----|-----|-----|-----|-----|";
-					    event.getChannel().sendMessage(board);
-					    if (winCheck(column, row, circle)) {
-							event.getChannel().sendMessage(event.getMessageAuthor().getDisplayName() + " has won the game!\nStart a new game by typing !connect4 again!");
-							load = false;
-							start = false;
+						column = Integer.parseInt(move);
+						if (column < 1 || column > 8) {
+							event.getChannel().sendMessage("Column index invalid! Please try your move again");
+							turn--;
+							row = 5;
+						} else {
+							rowCheck();
+							if (row == -1) {
+								event.getChannel().sendMessage("There are no more spaces left in this column! Please try your move again");
+								turn--;
+							} else {
+								circle = " :blue_circle: ";	
+								spaces[row * 7 + column - 1] = circle;
+							    board = "|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[0] + "|" + spaces[1] + "|" + spaces[2] + "|" + spaces[3] + "|" + spaces[4] + "|" + spaces[5] + "|" + spaces[6] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[7] + "|" + spaces[8] + "|" + spaces[9] + "|" + spaces[10] + "|" + spaces[11] + "|" + spaces[12] + "|" + spaces[13] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[14] + "|" + spaces[15] + "|" + spaces[16] + "|" + spaces[17] + "|" + spaces[18] + "|" + spaces[19] + "|" + spaces[20] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[21] + "|" + spaces[22] + "|" + spaces[23] + "|" + spaces[24] + "|" + spaces[25] + "|" + spaces[26] + "|" + spaces[27] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[28] + "|" + spaces[29] + "|" + spaces[30] + "|" + spaces[31] + "|" + spaces[32] + "|" + spaces[33] + "|" + spaces[34] + "|\n|-----|-----|-----|-----|-----|-----|-----|\n|" + spaces[35] + "|" + spaces[36] + "|" + spaces[37] + "|" + spaces[38] + "|" + spaces[39] + "|" + spaces[40] + "|" + spaces[41] + "|\n|-----|-----|-----|-----|-----|-----|-----|";
+							    event.getChannel().sendMessage(board);
+							    if (winCheck(column, row, circle)) {
+									event.getChannel().sendMessage(event.getMessageAuthor().getDisplayName() + " has won the game!\nStart a new game by typing !connect4 again!");
+									load = false;
+									start = false;
+								} 
+							    for (int i = 0; i < spaces.length; i++) {
+							    	if (spaces[i].equals("        ")) {
+										break;
+									}
+							    	if (i == spaces.length - 1) {
+										event.getChannel().sendMessage("The game has ended in a draw!\nStart a new game by typing !connect4 again!");
+										load = false;
+										start = false;
+									}
+								}
+								row = 5;
+							}
 						}
-						row = 5;
 					}
 				} else {
 					event.getChannel().sendMessage("It is not your turn yet " + event.getMessageAuthor().getDisplayName() + "!");
@@ -132,16 +176,21 @@ public class Connect4 extends CustomMessageCreateListener{
 	
 	void rowCheck() {
 		if(!spaces[row * 7 + column - 1].equals("        ")){
-			row--;
-			rowCheck();
+			if (row != 0) {
+				row--;
+				rowCheck();	
+			} else {
+				row = -1;
+			}
 		} 
 	}
 	
 	boolean winCheck(int column, int row, String circle) {
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 10; i++) {
+			//Horizontal check, -___
 			if (i == 0) {
 				for (int j = 0; j < 4; j++) {
-					if (row * 7 + column - 1 + j < 42) {
+					if (row * 7 + column - 1 + j < 42 && row * 7 + column - 1 + j > 0 && column < 5) {
 						if (!spaces[row * 7 + column - 1 + j].equals(circle)) {
 							j = 5;
 							win = false;
@@ -153,9 +202,10 @@ public class Connect4 extends CustomMessageCreateListener{
 						win = false;
 					}
 				}
+			//Horizontal check, ___-
 			} else if (i == 1 && !win) {
 				for (int j = 0; j < 4; j++) {
-					if (row * 7 + column - 1 - j < 42) {
+					if (row * 7 + column - 1 - j < 42 && row * 7 + column - 1 - j > 0 && column > 3) {
 						if (!spaces[row * 7 + column - 1 - j].equals(circle)) {
 							j = 5;
 							win = false;
@@ -167,9 +217,10 @@ public class Connect4 extends CustomMessageCreateListener{
 						win = false;
 					}
 				}
+			//Horizontal check, _-__
 			} else if (i == 2 && !win) {
 				for (int j = 2; j > -2; j--) {
-					if (row * 7 + column - 1 + j < 42) {
+					if (row * 7 + column - 1 + j < 42 && row * 7 + column - 1 + j > 0 && column > 1 && column < 6) {
 						if (!spaces[row * 7 + column - 1 + j].equals(circle)) {
 							j = -3;
 							win = false;
@@ -177,15 +228,31 @@ public class Connect4 extends CustomMessageCreateListener{
 							win = true;
 						}
 					} else {
-						j = 5;
+						j = -3;
 						win = false;
 					}
 				}
+			//Horizontal check __-_
 			} else if (i == 3 && !win) {
 				for (int j = 1; j > -3; j--) {
-					if (row * 7 + column - 1 + j < 42) {
+					if (row * 7 + column - 1 + j < 42 && row * 7 + column - 1 + j > 0 && column > 2 && column < 7) {
 						if (!spaces[row * 7 + column - 1 + j].equals(circle)) {
-							j = -3;
+							j = -4;
+							win = false;
+						} else {
+							win = true;
+						}
+					} else {
+						j = -4;
+						win = false;
+					}
+				}
+			//Vertical check
+			} else if (i == 4 && !win) {
+				for (int j = 0; j < 4; j++) {
+					if ((row + j) * 7 + column - 1 < 42 && (row + j) * 7 + column - 1 > 0) {
+						if (!spaces[(row + j) * 7 + column - 1].equals(circle)) {
+							j = 5;
 							win = false;
 						} else {
 							win = true;
@@ -195,10 +262,116 @@ public class Connect4 extends CustomMessageCreateListener{
 						win = false;
 					}
 				}
-			} else if (i == 4 && !win) {
+			//Diagonal check, top right
+			} else if (i == 5 && !win) {
 				for (int j = 0; j < 4; j++) {
-					if ((row + j) * 7 + column - 1 < 42) {
-						if (!spaces[(row + j) * 7 + column - 1].equals(circle)) {
+					if ((row + j) * 7 + column - 1 - j < 42 && (row + j) * 7 + column - 1 - j > 0 && column > 3) {
+						if (!spaces[(row + j) * 7 + column - 1 - j].equals(circle)) {
+							j = 5;
+							win = false;
+						} else {
+							win = true;
+						}
+					} else {
+						j = 5;
+						win = false;
+					}
+				}
+			//Diagonal check, top left
+			} else if (i == 6 && !win) {
+				for (int j = 0; j < 4; j++) {
+					if ((row + j) * 7 + column - 1 + j < 42 && (row + j) * 7 + column - 1 + j > 0 && column < 5) {
+						if (!spaces[(row + j) * 7 + column - 1 + j].equals(circle)) {
+							j = 5;
+							win = false;
+						} else {
+							win = true;
+						}
+					} else {
+						j = 5;
+						win = false;
+					}
+				}
+			//Diagonal check, bottom right
+			} else if (i == 7 && !win) {
+				for (int j = 0; j < 4; j++) {
+					if ((row - j) * 7 + column - 1 - j < 42 && (row - j) * 7 + column - 1 - j > 0 && column > 3) {
+						if (!spaces[(row - j) * 7 + column - 1 - j].equals(circle)) {
+							j = 5;
+							win = false;
+						} else {
+							win = true;
+						}
+					} else {
+						j = 5;
+						win = false;
+					}
+				}
+			//Diagonal check, bottom left
+			} else if (i == 8 && !win) {
+				for (int j = 0; j < 4; j++) {
+					if ((row - j) * 7 + column - 1 + j < 42 && (row - j) * 7 + column - 1 + j > 0 && column < 5) {
+						if (!spaces[(row - j) * 7 + column - 1 + j].equals(circle)) {
+							j = 5;
+							win = false;
+						} else {
+							win = true;
+						}
+					} else {
+						j = 5;
+						win = false;
+					}
+				}
+			//Diagonal check, upper mid right
+			} else if (i == 9 && !win) {
+				for (int j = 0; j < 4; j++) {
+					if ((row + j - 1) * 7 + column - 1 - j + 1 < 42 && (row + j - 1) * 7 + column - 1 - j + 1 > 0 && column > 2 && column < 7) {
+						if (!spaces[(row + j - 1) * 7 + column - 1 - j + 1].equals(circle)) {
+							j = 5;
+							win = false;
+						} else {
+							win = true;
+						}
+					} else {
+						j = 5;
+						win = false;
+					}
+				}
+			//Diagonal check, lower mid right
+			} else if (i == 10 && !win) {
+				for (int j = 0; j < 4; j++) {
+					if ((row + j - 2) * 7 + column - 1 - j + 2 < 42 && (row + j - 2) * 7 + column - 1 - j + 2 > 0 && column > 1 && column < 6) {
+						if (!spaces[(row + j - 2) * 7 + column - 1 - j + 2].equals(circle)) {
+							j = 5;
+							win = false;
+						} else {
+							win = true;
+						}
+					} else {
+						j = 5;
+						win = false;
+					}
+				}
+			//Diagonal check, upper mid left
+			} else if (i == 11 && !win) {
+				for (int j = 0; j < 4; j++) {
+					if ((row + j - 1) * 7 + column - 1 + j - 1 < 42 && (row + j - 1) * 7 + column - 1 + j - 1 > 0 && column > 1 && column < 6) {
+						if (!spaces[(row + j - 1) * 7 + column - 1 + j - 1].equals(circle)) {
+							j = 5;
+							win = false;
+						} else {
+							win = true;
+						}
+					} else {
+						j = 5;
+						win = false;
+					}
+				}
+			//Diagonal check, lower mid left
+			} else if (i == 12 && !win) {
+				for (int j = 0; j < 4; j++) {
+					if ((row + j - 2) * 7 + column - 1 + j - 2 < 42 && (row + j - 2) * 7 + column - 1 + j - 2 > 0 && column > 2 && column < 7) {
+						if (!spaces[(row + j - 2) * 7 + column - 1 + j - 2].equals(circle)) {
 							j = 5;
 							win = false;
 						} else {
