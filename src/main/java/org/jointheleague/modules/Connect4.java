@@ -13,19 +13,21 @@ public class Connect4 extends CustomMessageCreateListener{
 	
 	private String rules = "Rules:\n1. Each player (two players) has respective colors Red and Blue\n2. When placed, circles will obey laws of gravity and fall down\n3. Place 4 circles in a row to win the game\n4. 4 in a row can be achieved horizontally, vertically, and diagonally";
 	private String commands = "Commands:\n!join connect4: Joins the active Connect4 game\n!place<column>: Places circle on given column\n!end connect4: Ends the current running connect4 game\n!help connect4: Displays this help message";
-	private boolean load = false;
-	private boolean start = false;
-	private boolean win = false;
 	private String player1 = "";
 	private String player2 = "";
 	private String circle = "";
 	private String board = "";
+	private String[] spaces = new String[42];
+	private boolean load = false;
+	private boolean start = false;
+	private boolean win = false;
+	private boolean waiting;
 	private int row;
 	private int column;
 	private int turn;
 	private Message botEditMessage;
 	private Message botDeleteMessage;
-	private String[] spaces = new String[42];
+	private long current;
 	public Connect4(String channelName) {
 		super(channelName);
 		// TODO Auto-generated constructor stub
@@ -34,13 +36,14 @@ public class Connect4 extends CustomMessageCreateListener{
 	@Override
 	public void handle(MessageCreateEvent event) {
 		// TODO Auto-generated method stub
+		waiting = true;
 		if (!load) {
 			for (int i = 0; i < spaces.length; i++) {
 				spaces[i] = "        ";
 			}	
 		}
 		String message = event.getMessageContent().trim();
-		if (message.startsWith("!connect4")) {
+		if (message.equals("!connect4")) {
 			if (!load) {
 				board = "|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|";
 				player1 = "";
@@ -63,9 +66,6 @@ public class Connect4 extends CustomMessageCreateListener{
 				board = "|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|\n|        |        |        |        |        |        |        |\n|-----|-----|-----|-----|-----|-----|-----|";
 				event.getChannel().sendMessage(board);
 				//EDIT MESSAGE CODE:
-				//
-				//
-				//
 				CompletableFuture<MessageSet> set = event.getChannel().getMessages(1);
 				try {
 					botEditMessage = set.get().first();
@@ -76,9 +76,6 @@ public class Connect4 extends CustomMessageCreateListener{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				//
-				//
-				//
 				row = 5;
 				start = true;
 			}
@@ -107,7 +104,7 @@ public class Connect4 extends CustomMessageCreateListener{
 					if (move.equals("")) {
 						event.getChannel().sendMessage("No column index entered! Please try your move again");
 						CompletableFuture<MessageSet> set = event.getChannel().getMessages(1);
-						/*try {
+						try {
 							botDeleteMessage = set.get().first();
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
@@ -116,20 +113,60 @@ public class Connect4 extends CustomMessageCreateListener{
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						botDeleteMessage.delete();*/
 						event.deleteMessage();
+						current = System.currentTimeMillis();
+						while (waiting) {
+							if ((System.currentTimeMillis() - current)/1000 == 3) {
+								botDeleteMessage.delete();
+								waiting = false;
+							}
+						}
 						turn--;
 					} else {
 						column = Integer.parseInt(move);
 						if (column < 1 || column > 8) {
 							event.getChannel().sendMessage("Column index invalid! Please try your move again");
+							CompletableFuture<MessageSet> set = event.getChannel().getMessages(1);
+							try {
+								botDeleteMessage = set.get().first();
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (ExecutionException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 							event.deleteMessage();
+							current = System.currentTimeMillis();
+							while (waiting) {
+								if ((System.currentTimeMillis() - current)/1000 == 3) {
+									botDeleteMessage.delete();
+									waiting = false;
+								}
+							}
 							turn--;
 						} else {
 							rowCheck();
 							if (row == -1) {
 								event.getChannel().sendMessage("There are no more spaces left in this column! Please try your move again");
+								CompletableFuture<MessageSet> set = event.getChannel().getMessages(1);
+								try {
+									botDeleteMessage = set.get().first();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (ExecutionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 								event.deleteMessage();
+								current = System.currentTimeMillis();
+								while (waiting) {
+									if ((System.currentTimeMillis() - current)/1000 == 3) {
+										botDeleteMessage.delete();
+										waiting = false;
+									}
+								}
 								turn--;
 								row = 5;
 							} else {
@@ -166,7 +203,7 @@ public class Connect4 extends CustomMessageCreateListener{
 					String move = message.substring(6);
 					if (move.equals("")) {
 						event.getChannel().sendMessage("No column index entered! Please try your move again");
-						/*CompletableFuture<MessageSet> set = event.getChannel().getMessages(1);
+						CompletableFuture<MessageSet> set = event.getChannel().getMessages(1);
 						try {
 							botDeleteMessage = set.get().first();
 						} catch (InterruptedException e) {
@@ -176,20 +213,61 @@ public class Connect4 extends CustomMessageCreateListener{
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						botDeleteMessage.delete();*/
 						event.deleteMessage();
+						current = System.currentTimeMillis();
+						while (waiting) {
+							if ((System.currentTimeMillis() - current)/1000 == 3) {
+								System.out.println(botDeleteMessage);
+								botDeleteMessage.delete();
+								waiting = false;
+							}
+						}
 						turn--;
 					} else {
 						column = Integer.parseInt(move);
 						if (column < 1 || column > 8) {
 							event.getChannel().sendMessage("Column index invalid! Please try your move again");
+							CompletableFuture<MessageSet> set = event.getChannel().getMessages(1);
+							try {
+								botDeleteMessage = set.get().first();
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (ExecutionException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 							event.deleteMessage();
+							current = System.currentTimeMillis();
+							while (waiting) {
+								if ((System.currentTimeMillis() - current)/1000 == 3) {
+									botDeleteMessage.delete();
+									waiting = false;
+								}
+							}
 							turn--;
 						} else {
 							rowCheck();
 							if (row == -1) {
 								event.getChannel().sendMessage("There are no more spaces left in this column! Please try your move again");
+								CompletableFuture<MessageSet> set = event.getChannel().getMessages(1);
+								try {
+									botDeleteMessage = set.get().first();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (ExecutionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 								event.deleteMessage();
+								current = System.currentTimeMillis();
+								while (waiting) {
+									if ((System.currentTimeMillis() - current)/1000 == 3) {
+										botDeleteMessage.delete();
+										waiting = false;
+									}
+								}
 								turn--;
 								row = 5;
 							} else {
@@ -237,7 +315,7 @@ public class Connect4 extends CustomMessageCreateListener{
 	}
 	
 	boolean winCheck(int column, int row, String circle) {
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 13; i++) {
 			//Horizontal check, -___
 			if (i == 0) {
 				for (int j = 0; j < 4; j++) {
