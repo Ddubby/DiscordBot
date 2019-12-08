@@ -51,7 +51,7 @@ public class Connect4 extends CustomMessageCreateListener{
 				turn = 0;
 				event.getChannel().sendMessage("Loading Connect4...");
 				event.getChannel().sendMessage(board);
-				event.getChannel().sendMessage("\nStart the game by using !join connect4");
+				event.getChannel().sendMessage("\nStart the game by using !join connect4 or use !help connect4 to learn the rules! (please use !help connect4 before game starts)");
 				load = true;	
 			} else {
 				event.getChannel().sendMessage("A connect4 game is already underway!");
